@@ -4,6 +4,75 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 
 
+class CheckMissingValues(BaseEstimator, TransformerMixin):
+    """
+    A scikit-learn transformer that checks for missing values in a DataFrame.
+
+    This transformer identifies columns with missing values and provides a summary of the number of missing values in each column.
+
+    Attributes:
+    ----------
+    errors : pd.DataFrame
+        A DataFrame containing the names of columns with missing values and the count of missing values in each column.
+
+    Methods:
+    -------
+    fit(X, y=None):
+        Fits the transformer. This method is a placeholder and does not perform any fitting.
+
+    transform(X):
+        Identifies columns with missing values in the DataFrame and stores the results in the 'errors' attribute.
+        Returns a DataFrame with the names of the columns and the corresponding count of missing values.
+    """
+
+    def __init__(self):
+        """
+        Initializes the CheckMissingValues transformer.
+        """
+        self.errors = pd.DataFrame()
+
+    def fit(self, X, y=None):
+        """
+        Fits the transformer. This method is a placeholder and does not perform any fitting.
+
+        Parameters:
+        ----------
+        X : pd.DataFrame
+            The input DataFrame to fit the transformer on.
+        y : None
+            An optional parameter, not used in this method.
+
+        Returns:
+        -------
+        self : CheckMissingValues
+            Returns the instance itself.
+        """
+        return self
+
+    def transform(self, X):
+        """
+        Identifies columns with missing values in the DataFrame and stores the results.
+
+        Parameters:
+        ----------
+        X : pd.DataFrame
+            The input DataFrame in which missing values are to be checked.
+
+        Returns:
+        -------
+        pd.DataFrame
+            A DataFrame containing the names of the columns with missing values and the count of missing values in each column.
+            Also stores this information in the 'errors' attribute for inspection.
+        """
+        missing_counts = X.isnull().sum()
+        missing_counts = missing_counts[missing_counts > 0]
+        self.errors = pd.DataFrame(
+            {"Column": missing_counts.index, "Missing Values": missing_counts.values}
+        )
+
+        return self.errors
+
+
 class DateConverter(BaseEstimator, TransformerMixin):
     """
     A scikit-learn transformer for converting date columns in a DataFrame to datetime objects.
@@ -87,6 +156,7 @@ class DateConverter(BaseEstimator, TransformerMixin):
         dates_columns = X.filter(regex="date").columns
         X_temp = X.copy()
         not_converted_dates = pd.DataFrame()
+        self.errors = not_converted_dates
 
         for date_format in self.date_formats:
             try:
@@ -103,6 +173,74 @@ class DateConverter(BaseEstimator, TransformerMixin):
                 break
 
         return not_converted_dates
+
+
+class CheckInvalidDates(BaseEstimator, TransformerMixin):
+    """
+    A scikit-learn transformer that identifies rows with invalid date ranges in a DataFrame.
+
+    This transformer is used to find rows where the 'disbursement_date' is greater than the 'expire_date'.
+    It is assumed that the date columns are already in datetime format.
+
+    Attributes:
+    ----------
+    errors : pd.DataFrame, optional
+        A DataFrame containing rows with invalid dates, where 'disbursement_date' > 'expire_date'.
+
+    Methods:
+    -------
+    fit(X, y=None):
+        Fits the transformer. This method is a placeholder and does not perform any fitting.
+
+    transform(X):
+        Identifies rows with invalid date ranges in the DataFrame.
+        Returns a DataFrame with rows where 'disbursement_date' is greater than 'expire_date'.
+    """
+
+    def __init__(self):
+        """
+        Initializes the CheckInvalidDates transformer.
+        """
+        self.errors = None
+
+    def fit(self, X, y=None):
+        """
+        Fits the transformer. This method is a placeholder and does not perform any fitting.
+
+        Parameters:
+        ----------
+        X : pd.DataFrame
+            The input DataFrame to fit the transformer on.
+        y : None
+            An optional parameter, not used in this method.
+
+        Returns:
+        -------
+        self : CheckInvalidDates
+            Returns the instance itself.
+        """
+        return self
+
+    def transform(self, X):
+        """
+        Identifies rows with invalid date ranges in the DataFrame.
+
+        Parameters:
+        ----------
+        X : pd.DataFrame
+            The input DataFrame with 'disbursement_date' and 'expire_date' columns in datetime format.
+
+        Returns:
+        -------
+        pd.DataFrame
+            A DataFrame containing rows where 'disbursement_date' is greater than 'expire_date'.
+            Also stores these rows in the 'errors' attribute for inspection.
+        """
+
+        dates_columns = X[X["disbursement_date"] > X["expire_date"]]
+        self.errors = dates_columns
+
+        return dates_columns
 
 
 class ConvertedNumeric(BaseEstimator, TransformerMixin):
