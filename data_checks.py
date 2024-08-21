@@ -139,7 +139,7 @@ class CheckMissingValues(BaseEstimator, TransformerMixin):
         missing_counts = missing_counts[missing_counts > 0]
         self.errors = pd.DataFrame(
             {"Column": missing_counts.index, "Missing Values": missing_counts.values}
-        )
+        ).sort_values('Missing Values',ascending=False)
 
         return self.errors
 
