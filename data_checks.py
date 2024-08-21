@@ -11,6 +11,7 @@ mandatory_columns = ['loan_id', 'disbursement_date', 'expire_date', 'is_employed
        'currency', 'employee_sector', 'status', 'loan_status']
 
 
+
 class MandatoryColumns(BaseEstimator, TransformerMixin):
     """
     A custom transformer that ensures specified mandatory columns are present in a pandas DataFrame.
@@ -436,15 +437,4 @@ class CheckDuplicates(BaseEstimator, TransformerMixin):
         return duplicates
 
 
-def create_pipeline(data):
-    pipeline = Pipeline([
-    ('mandatory_columns', MandatoryColumns(mandatory_columns=mandatory_columns)),
-    ('check_missing_values', CheckMissingValues()),
-    ('date_converter', DateConverter()),
-    #('check_invalid_dates', CheckInvalidDates()),
-    ('convert_numeric', ConvertedNumeric()),
-    ('check_negative_amounts_and_zeros', CheckNegativeAmountsAndZeros()),
-    ('check_duplicates', CheckDuplicates()),
-    ])
-    return pipeline
 
