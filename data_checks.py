@@ -4,40 +4,52 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 
 
-
-mandatory_columns = ['loan_id', 'disbursement_date', 'expire_date', 'is_employed',
-       'loan_amount', 'number_of_defaults', 'outstanding_balance',
-       'interest_rate', 'age', 'remaining_term', 'salary', 'sector',
-       'currency', 'employee_sector', 'status', 'loan_status']
-
+mandatory_columns = [
+    "loan_id",
+    "disbursement_date",
+    "expire_date",
+    "is_employed",
+    "loan_amount",
+    "number_of_defaults",
+    "outstanding_balance",
+    "interest_rate",
+    "age",
+    "remaining_term",
+    "salary",
+    "sector",
+    "currency",
+    "employee_sector",
+    "status",
+    "loan_status",
+]
 
 
 class MandatoryColumns(BaseEstimator, TransformerMixin):
     """
     A custom transformer that ensures specified mandatory columns are present in a pandas DataFrame.
-    
+
     Parameters
     ----------
     mandatory_columns : list
         A list of column names that are required to be present in the DataFrame.
-        
+
     Attributes
     ----------
     mandatory_columns : list
         Stores the list of mandatory column names.
     errors : list or None
-        A list of missing mandatory columns if any are not found in the DataFrame, 
+        A list of missing mandatory columns if any are not found in the DataFrame,
         otherwise an empty list. Initially set to None.
-    
+
     Methods
     -------
     fit(X, y=None)
         Fits the transformer, returning itself. This method doesn't alter the DataFrame.
-        
+
     transform(X)
-        Checks if all mandatory columns are present in the DataFrame. If any are missing, 
+        Checks if all mandatory columns are present in the DataFrame. If any are missing,
         stores them in `self.errors`. Returns the unaltered DataFrame `X`.
-    
+
     get_errors()
         Returns the list of missing mandatory columns.
     """
@@ -45,17 +57,19 @@ class MandatoryColumns(BaseEstimator, TransformerMixin):
     def __init__(self, mandatory_columns):
         self.mandatory_columns = mandatory_columns
         self.errors = None
-    
+
     def fit(self, X, y=None):
         return self
-    
+
     def transform(self, X):
-        missing_columns = [col for col in self.mandatory_columns if col not in X.columns]
+        missing_columns = [
+            col for col in self.mandatory_columns if col not in X.columns
+        ]
         if missing_columns:
             self.errors = missing_columns
         else:
             self.errors = []
-        return X 
+        return X
 
     def get_errors(self):
         return self.errors
@@ -435,6 +449,3 @@ class CheckDuplicates(BaseEstimator, TransformerMixin):
             raise ValueError("Input must be a DataFrame")
         duplicates = X.loc[X.duplicated(keep=False)].sort_values("loan_id")
         return duplicates
-
-
-
