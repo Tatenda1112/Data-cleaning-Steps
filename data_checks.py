@@ -37,6 +37,16 @@ class MandatoryColumns(BaseEstimator, TransformerMixin):
     def get_errors(self):
         return self.errors
 
+class CheckMissingLoanId(BaseEstimator,TransformerMixin):
+    
+    def __init__(self):
+        pass
+    
+    def fit(self,X,y=None):
+        return self
+    
+    def transform(self,X):
+        return X.loc[X['loan_id'].isnull()]
 
 class CheckMissingValues(BaseEstimator, TransformerMixin):
     def __init__(self):
