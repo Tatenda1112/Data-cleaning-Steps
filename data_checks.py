@@ -197,7 +197,7 @@ class ConvertedNumeric(BaseEstimator, TransformerMixin):
             "remaining_term",
             "salary",
         ]
-        
+
         X[num_columns] = X[num_columns].apply(pd.to_numeric, errors="coerce")
         not_converted_num = X.loc[X[num_columns].isnull().any(axis=1)]
         return not_converted_num
